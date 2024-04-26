@@ -15,6 +15,8 @@
 , rocmPackages
 , cudaPackages
 , linuxPackages
+, vulkan-headers
+, vulkan-loader
 , darwin
 
 , config
@@ -50,7 +52,7 @@ let
   };
 
 
-  accelIsValid = builtins.elem acceleration [ null false "rocm" "cuda" ];
+  accelIsValid = builtins.elem acceleration [ null false "rocm" "cuda" "vulkan" ];
   validateFallback = lib.warnIf (config.rocmSupport && config.cudaSupport)
     (lib.concatStrings [
       "both `nixpkgs.config.rocmSupport` and `nixpkgs.config.cudaSupport` are enabled, "
@@ -68,6 +70,7 @@ let
 
   enableRocm = shouldEnable "rocm" config.rocmSupport;
   enableCuda = shouldEnable "cuda" config.cudaSupport;
+  enableVulkan = acceleration == "vulkan";
 
 
   rocmClang = linkFarm "rocm-clang" {
@@ -147,6 +150,9 @@ goBuild ((lib.optionalAttrs enableRocm {
     libdrm
   ] ++ lib.optionals enableCuda [
     cudaPackages.cuda_cudart
+  ] ++ lib.optionals enableVulkan [
+    vulkan-headers
+    vulkan-loader
   ] ++ lib.optionals stdenv.isDarwin
     metalFrameworks;
 

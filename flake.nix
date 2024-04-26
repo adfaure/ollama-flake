@@ -30,6 +30,7 @@
         default = buildOllama pkgsUnfree { };
         rocm = buildOllama pkgs { acceleration = "rocm"; };
         cuda = buildOllama pkgsUnfree { acceleration = "cuda"; };
+        vulkan = buildOllama pkgs { acceleration = "vulkan"; };
         cpu = buildOllama pkgs { acceleration = false; };
       }));
     in
